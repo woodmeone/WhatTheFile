@@ -247,6 +247,9 @@ class BatchFilePage(tk.Frame):
         self.file_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
+        # 绑定Treeview点击事件用于切换复选框状态
+        self.file_tree.bind('<ButtonRelease-1>', self.toggle_checkbox)
+
         # 批量操作按钮
         self.button_frame = ttk.Frame(self)
         self.button_frame.pack(fill=tk.X, pady=15)
@@ -340,7 +343,7 @@ class BatchFilePage(tk.Frame):
                 
                 # 添加到表格
                 # 添加第四列默认值'✗'（未确认）
-                self.file_tree.insert('', tk.END, values=(filename, current_ext, suggested_ext, '✗'))
+                self.file_tree.insert('', tk.END, values=(filename, current_ext, suggested_ext, '☐'))
 
     def get_suggested_extension(self, file_path):
         header = self.read_file_header(file_path)
@@ -399,13 +402,31 @@ class BatchFilePage(tk.Frame):
 
         return sorted(matches, key=lambda x: x['confidence'], reverse=True)
 
+    def toggle_checkbox(self, event):
+        # 获取点击位置的列
+        region = self.file_tree.identify_region(event.x, event.y)
+        if region == 'cell':
+            column = int(self.file_tree.identify_column(event.x).replace('#', '')) - 1
+            # 只处理第4列(索引3)的点击
+            if column == 3:
+                item = self.file_tree.identify_row(event.y)
+                if item:
+                    values = list(self.file_tree.item(item, "values"))
+                    # 切换复选框状态
+                    values[3] = "☑" if values[3] == "☐" else "☐"
+                    self.file_tree.item(item, values=values)
+
     def select_all(self):
         for item in self.file_tree.get_children():
-            self.file_tree.item(item, values=(self.file_tree.item(item, "values")[0], self.file_tree.item(item, "values")[1], self.file_tree.item(item, "values")[2], "✓"))
+            values = list(self.file_tree.item(item, "values"))
+            values[3] = "☑"
+            self.file_tree.item(item, values=values)
 
     def deselect_all(self):
         for item in self.file_tree.get_children():
-            self.file_tree.item(item, values=(self.file_tree.item(item, "values")[0], self.file_tree.item(item, "values")[1], self.file_tree.item(item, "values")[2], "✗"))
+            values = list(self.file_tree.item(item, "values"))
+            values[3] = "☐"
+            self.file_tree.item(item, values=values)
 
     def append_info(self, message):
         self.info_text.config(state=tk.NORMAL)
@@ -429,7 +450,7 @@ class BatchFilePage(tk.Frame):
             filename, current_ext, suggested_ext, confirm = values
 
             # 允许强制修改扩展名，移除对suggested_ext的限制
-            if confirm == "✓": # and suggested_ext not in ["未知", current_ext]:
+            if confirm == "☑": # 使用新的复选框选中状态值
                 # 获取新文件名
                 name_without_ext = os.path.splitext(filename)[0]
                 new_filename = f"{name_without_ext}{suggested_ext}"
