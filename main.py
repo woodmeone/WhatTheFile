@@ -4,6 +4,7 @@ import os
 import binascii
 import os
 import struct
+import webbrowser
 from file_signatures import SORTED_SIGNATURES
 
 class SingleFilePage(tk.Frame):
@@ -548,6 +549,17 @@ class FileIdentifierApp:
         self.batch_page_btn.pack(fill=tk.X, pady=1, ipady=5)
         self.batch_page_btn.bind('<Enter>', lambda e: self.on_hover(e, self.batch_page_btn))
         self.batch_page_btn.bind('<Leave>', lambda e: self.off_hover(e, self.batch_page_btn))
+
+        # 添加底部像素风格文字标识
+        logo_frame = ttk.Frame(self.sidebar_frame, style='Logo.TFrame')
+        logo_frame.pack(side=tk.BOTTOM, pady=20)
+
+        def open_bilibili():
+            webbrowser.open("https://space.bilibili.com/3546740397443899?spm_id_from=333.337.0.0")
+
+        self.style.configure('Logo.TButton', font=('Courier New', 12, 'bold'), background='#1a73e8', foreground='#ff9800', relief=tk.FLAT)
+        logo_button = ttk.Button(logo_frame, text="该工具由比特毯子开发", style='Logo.TButton', command=open_bilibili, cursor="hand2")
+        logo_button.pack(pady=5)
 
         # 创建内容区域
         self.content_frame = ttk.Frame(self.paned_window)
