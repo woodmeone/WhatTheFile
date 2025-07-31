@@ -521,13 +521,11 @@ class FileIdentifierApp:
 
         # 创建侧边栏按钮
         # 侧边栏按钮样式
-        self.style.configure('Sidebar.TButton', font=('微软雅黑', 10), width=15, padding=(5, 10))
-        self.style.configure('Sidebar.Hover.TButton', background='#e0e0e0')
+        self.style.configure('Sidebar.TButton', font=('Courier New', 10), width=15, height=2, padding=(5, 10), borderwidth=0, relief='flat')
         self.style.configure('Sidebar.Selected.TButton', background='#0078d7', foreground='white')
         self.style.map('Sidebar.TButton',
             background=[('selected', '#0078d7'), ('active', '#e0e0e0')],
-            foreground=[('selected', 'white'), ('active', '#000000')],
-            relief=[('selected', 'flat'), ('!selected', 'ridge')]
+            foreground=[('selected', 'white'), ('active', '#000000')]
         )
 
         self.single_page_btn = ttk.Button(
@@ -536,9 +534,8 @@ class FileIdentifierApp:
             command=lambda: self.show_page("single"),
             style='Sidebar.TButton'
         )
-        self.single_page_btn.pack(fill=tk.X, pady=1, ipady=5)
-        self.single_page_btn.bind('<Enter>', lambda e: self.on_hover(e, self.single_page_btn))
-        self.single_page_btn.bind('<Leave>', lambda e: self.off_hover(e, self.single_page_btn))
+        self.single_page_btn.pack(fill=tk.X, pady=1)
+        
 
         self.batch_page_btn = ttk.Button(
             self.sidebar_frame, 
@@ -546,9 +543,8 @@ class FileIdentifierApp:
             command=lambda: self.show_page("batch"),
             style='Sidebar.TButton'
         )
-        self.batch_page_btn.pack(fill=tk.X, pady=1, ipady=5)
-        self.batch_page_btn.bind('<Enter>', lambda e: self.on_hover(e, self.batch_page_btn))
-        self.batch_page_btn.bind('<Leave>', lambda e: self.off_hover(e, self.batch_page_btn))
+        self.batch_page_btn.pack(fill=tk.X, pady=1)
+        
 
         # 添加底部像素风格文字标识
         logo_frame = ttk.Frame(self.sidebar_frame, style='Logo.TFrame')
@@ -574,14 +570,6 @@ class FileIdentifierApp:
         # 默认显示单次处理页面
         self.show_page("single")
 
-    def on_hover(self, event, button):
-        if not button.instate(['selected']):
-            button.config(style='Sidebar.Hover.TButton')
-
-    def off_hover(self, event, button):
-        if not button.instate(['selected']):
-            button.config(style='Sidebar.TButton')
-
     def show_page(self, page_name):
         # 重置所有按钮状态
         self.single_page_btn.state(['!selected'])
@@ -597,18 +585,8 @@ class FileIdentifierApp:
         
         if page_name == "single":
             self.single_page_btn.state(['selected'])
-            self.style.configure('Sidebar.TButton', padding=(10, 5))
         else:
             self.batch_page_btn.state(['selected'])
-            self.style.configure('Sidebar.TButton', padding=(5, 5))
-        
-        # 添加页面切换动画
-        pass
-        # 隐藏所有页面
-        for page in self.pages.values():
-            page.pack_forget()
-        # 显示选中的页面
-        self.pages[page_name].pack(fill=tk.BOTH, expand=True)
 
         
 
